@@ -1,0 +1,241 @@
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Dice Game</title>
+
+        <script>
+            var playerPoints = 0;
+            var computerPoints = 0;
+            var gameActive = false;
+
+            function startGame()
+            {
+                gameActive = true;
+                playerPoints = 0;
+                computerPoints = 0;
+                document.getElementById('rollButton').style.display = 'inline';
+                document.getElementById('quitButton').style.display = 'inline';
+                document.getElementById('startButton').style.display = 'none';
+                document.getElementById('container').style.display = 'block';
+                document.getElementById('player-container').style.display = 'block'; // Show player's dice container
+                document.getElementById('computer-container').style.display = 'block'; // Show computer's dice container
+                document.getElementById('dicerollgif').style.display = 'none';
+                document.getElementById('gameStatus').innerText = '';
+                updateDiceImages();
+                document.getElementById('endButton').style.display = 'inline';
+            }
+
+            function rollDice()
+            {
+                var playerDice1 = document.getElementById('playerDie1');
+                var playerDice2 = document.getElementById('playerDie2');
+                var computerDice1 = document.getElementById('computerDie1');
+                var computerDice2 = document.getElementById('computerDie2');
+
+                var playerRoll = [Math.floor(Math.random() * 6) + 1, Math.floor(Math.random() * 6) + 1];
+                var computerRoll = [Math.floor(Math.random() * 6) + 1, Math.floor(Math.random() * 6) + 1];
+
+                rollDieAnimation(playerDice1);
+                rollDieAnimation(playerDice2);
+                rollDieAnimation(computerDice1);
+                rollDieAnimation(computerDice2);
+
+                setTimeout(function () {
+                    playerDice1.src = 'dice' + playerRoll[0] + '.png';
+                    playerDice2.src = 'dice' + playerRoll[1] + '.png';
+                    computerDice1.src = 'dice' + computerRoll[0] + '.png';
+                    computerDice2.src = 'dice' + computerRoll[1] + '.png';
+
+                    updateGame(playerRoll, computerRoll);
+                }, 1000);
+            }
+
+            function rollDieAnimation(die) {
+                var faces = ['1', '2', '3', '4', '5', '6'];
+                var i = 0;
+                var interval = setInterval(function ()
+                {
+                    die.src = 'dice' + faces[i] + '.png';
+                    i++;
+                    if (i === faces.length)
+                        clearInterval(interval);
+                }, 100);
+            }
+
+            function sumDice(dice)
+            {
+                return dice[0] + dice[1];
+            }
+
+            function updateGame(playerRoll, computerRoll)
+            {
+                var playerSum = sumDice(playerRoll);
+                var computerSum = sumDice(computerRoll);
+                var resultText = 'Your Points: ' + playerSum +
+                        '<br>Computer Points: ' + computerSum + '<br>';
+
+                if (playerSum === computerSum)
+                {
+                    resultText += "It's a tie. No points awarded.";
+                } else
+                {
+                    var roundWinner = "computer";
+                    var winningRoll = computerRoll;
+                    var winningSum = computerSum;
+                    if (playerSum > computerSum)
+                    {
+                        roundWinner = "player";
+                        winningRoll = playerRoll;
+                        winningSum = playerSum;
+                    }
+
+                    var points = (winningRoll[0] === winningRoll[1]) ? winningSum * 2 : winningSum;
+                    if (roundWinner === "player")
+                    {
+                        playerPoints += points;
+                        resultText += 'You win this round. ' + points + ' points awarded.<br>';
+                    } else
+                    {
+                        computerPoints += points;
+                        resultText += 'Computer wins this round. ' + points + ' points awarded.<br>';
+                    }
+                }
+
+                // Update current score
+                resultText += 'Current Score = You: ' + playerPoints + ' Computer: ' + computerPoints;
+
+                document.getElementById('gameStatus').innerHTML = resultText;
+                document.getElementById('player-points').innerText = 'Points: ' + playerPoints;
+                document.getElementById('computer-points').innerText = 'Points: ' + computerPoints;
+
+                checkGameOver();
+            }
+
+            function checkGameOver()
+            {
+                if (playerPoints >= 100 || computerPoints >= 100)
+                {
+                    gameActive = false;
+                    document.getElementById('rollButton').style.display = 'none';
+                    document.getElementById('quitButton').style.display = 'none';
+                    document.getElementById('gameStatus').innerHTML += '<br>Game Over. ' + (playerPoints >= 100 ? "You win!" : "Computer wins!");
+                } else
+                {
+                    document.getElementById('quitButton').style.display = '';
+                }
+            }
+            function endGame()
+            {
+                gameActive = false;
+                checkGameOver();
+
+                if (!gameActive)
+                {
+                    document.getElementById('rollButton').style.display = 'none';
+                    document.getElementById('quitButton').style.display = 'none';
+                    document.getElementById('endButton').style.display = 'none';
+                    document.getElementById('gameStatus').innerHTML += '<br>Game Ended.';
+                    document.getElementById('player-container').style.display = 'none';
+                    document.getElementById('computer-container').style.display = 'none';
+                    document.getElementById('dicerollgif').style.display = 'block';
+                    document.getElementById('startButton').style.display = 'inline';
+                }
+            }
+        </script>
+
+        <style>
+            .die {
+                margin-bottom: 10px;
+                width: 100px;
+                height: 100px;
+            }
+            #result {
+                margin-top: 50px;
+                font-size: 18px;
+            }
+
+            .dice-img {
+                width: 100px;
+                height: 100px;
+                margin-right: 5px;
+            }
+            #dicerollgif {
+
+                height: auto;
+            }
+
+            body {
+                font-family: Arial, sans-serif;
+                text-align: center;
+                background-color: #192841;
+                color: white;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                height: 100%;
+                margin: 0;
+            }
+
+            #container {
+                padding: 30px;
+                overflow: scroll;
+                border: medium groove #4CAF50;
+                line-height: 140%;
+                width: 600px;
+                height: 600px;
+                margin-top: 20px;
+            }
+
+            button {
+                padding: 10px 20px;
+                margin-top: 10px;
+                background-color: #4CAF50; 
+                border: none;
+                border-radius: 5px;
+                color: white;
+                font-weight: bold;
+            }
+            #dicerollgif {
+
+                height: auto;
+            }
+            #computer-roll-label
+            {
+                font-size: 120%;
+            }
+
+            #player-roll-label
+            {
+                font-size: 120%;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="container">
+            <div>
+                <h1>Dice Game</h1>
+                <p id="start-message">Click the button below to start the game.</p>
+                <img id="dicerollgif" src="diceroll.gif" alt="alt"/>
+            </div>
+            <div id="player-container" style="display: none;">
+                <p id="player-roll-label">Player:</p>
+                <div id="player-roll" style="display: none;"></div>
+                <img id="playerDie1" class="die" src="dice1.png">
+                <img id="playerDie2" class="die" src="dice1.png">
+
+            </div>
+            <div id="computer-container" style="display: none;">
+                <p id="computer-roll-label">Computer:</p>
+                <div id="computer-roll" style="display: none;"></div>
+                <img id="computerDie1" class="die" src="dice1.png">
+                <img id="computerDie2" class="die" src="dice1.png">
+
+            </div>
+            <p id="gameStatus"></p>
+            <button id="startButton" onclick="startGame()">Start Game</button>
+            <button id="rollButton" style="display: none;" onclick="rollDice()">Roll Dice</button>
+            <button id="quitButton" onclick="startGame();">End Game</button>
+        </div>
+    </body>
+</html>
